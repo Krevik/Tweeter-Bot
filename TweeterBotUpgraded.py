@@ -10,7 +10,7 @@ from datetime import time as time_new
 # Authenticate to Twitter
 consumer_key_key = "consumer_key";
 consumer_secret_key = "consumer_secret_key";
-access_token_key = "access_token_key-pqvEfE8Zm5lLXzK86rTEr0HSXYK2Kj";
+access_token_key = "access_token_key";
 access_token_secret_key = "access_token_secret_key";
 auth = tweepy.OAuthHandler(consumer_key_key, consumer_secret_key)
 auth.set_access_token(access_token_key, access_token_secret_key)
