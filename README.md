@@ -7,7 +7,7 @@
 ##### -GAINING NFT'S from giveaways
 
 ## How to run:
-##### 1.Install tweepy:
+##### 1.Install tweepy with cmd:
 ##### ```pip install tweepy```
 ##### 2.Create your tweeter developer account on ```https://developer.twitter.com```
 ##### 3.Fill in code your ```consumer_key``` ```consumer_secret_key``` ```access_token_key``` and ```access_token_secret_key```
