@@ -76,7 +76,10 @@ keyWordsSet5 = ['airdrop', 'rt', "retweet", "giveway", "opensea.io/"];
 keyWordsSet6 = ['eth', '#eth'];
 keyWordsSet7 = ['adress', 'wallet'];
 
+#####################
 keyWordsPokemon = ['pokemon', 'bulbasaur', 'charmander', 'squirtle'];
+keyWordsPiNetwork = ['crypto'];
+
 
 
 myETHWalletAdress = "0xE59FfC3689af47fC501Ce84A2F1cf3C435a67869";
@@ -249,7 +252,7 @@ def handlePokemonTweet(tweet):
             is_reply = True
         shilled = False;
         #check if we want to shill under the tweet that can't be reply
-        if doesProvokeMeToShill(tweet) and not is_reply:
+        if not is_reply:
             replyToTweet(tweet, getShillTextPokemon());
             shilled=True;   
         retweeted = False;
@@ -257,7 +260,7 @@ def handlePokemonTweet(tweet):
     time.sleep(random.randint(10,25));
 
 def getFewHashtags(list1):
-    amount = random.randint(5, len(list1) - 1);
+    amount = random.randint(1, 3);
     result = [];
     x = 1;
     while(x < amount):
@@ -464,6 +467,65 @@ class ShillPokemonCollection(threading.Thread):
             stream.filter(track=keyWordsPokemon)
             time.sleep(random.randint(20,30));
 
+
+hashtagsListPi = ["CryptoProject", "PINetwork", "Pi", "Crypto", "MobilePhoneMining", "MobileMining", "PhoneCrypto", "Cryptocurrency", "RevolutionProject"];
+def getShillTextPiNetwork():
+    result = "";
+    result = result + "Pi is a new cryptocurrency project. You can get 1 free Pi, and mine it using your mobile phone!" + "\n";
+    result = result + "Mining doesn't consume your phone power, doesn't use it." + "\n";
+    result = result + "Just download the app and create account using my nick as referral (invitation) 'Krevik' " + "\n";
+    hashtags = getFewHashtags(hashtagsListPi);
+        for hashtag in hashtags:
+            result = result + str("#" + hashtag + " ");
+            
+    return result;
+
+def handlePiNetworkTweet(tweet):
+    #check if we don't like it already
+    if(not tweet.favorited):
+        is_reply = False;
+        #check if the tweet is a reply
+        if tweet.in_reply_to_status_id is not None:
+            # Tweet is a reply
+            is_reply = True
+        shilled = False;
+        #check if we want to shill under the tweet that can't be reply
+        if not is_reply:
+            replyToTweet(tweet, getShillTextPiNetwork());
+            shilled=True;   
+        retweeted = False;
+        
+    time.sleep(random.randint(10,25));
+
+class PiNetworkStreamListener(tweepy.Stream):
+    api1 = tweepy.API(auth, wait_on_rate_limit=True)
+    def __init__(self, api=api1):
+        super(PokemonStreamListener,self).__init__(consumer_key_key,consumer_secret_key,access_token_key,access_token_secret_key)
+    #function to collect tweets 
+    def on_status (self,status):
+        #checkTime();
+        tweet = status;
+        handlePokemonTweet(tweet);
+    def on_error(self, status_code):
+        if status_code == 420:
+            #returning False in on_error disconnects the stream
+            return False
+
+
+class PINetworkReferall(threading.Thread):
+    def __init__(self, threadID, name, counter):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.name = name
+        self.counter = counter
+    def run(self):
+        print("Starting Pi Network Stream Listening Thread");
+        while True:
+            #checkTime();
+            stream = PiNetworkStreamListener()
+            stream.filter(track=keyWordsPiNetwork)
+            time.sleep(random.randint(20,30));
+
             
 
 # Create new threads
@@ -472,6 +534,7 @@ thread3 = FollowingThread(3, "Thread-3", 3);
 thread4 = TwittingThread(4, "Thread-4", 4);
 thread5 = SharingCollectionsThread(5, "Thread-5", 5);
 thread6 = ShillPokemonCollection(6, "Thread-6", 6);
+thread7 = PINetworkReferall(7, "Thread-7", 7);
 
 def runBot():
     login();
@@ -480,5 +543,6 @@ def runBot():
     thread4.start();
     thread5.start();
     thread6.start();
+    thread7.start();
 
 runBot();
