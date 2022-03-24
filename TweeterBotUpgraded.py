@@ -8,10 +8,10 @@ from datetime import datetime
 from datetime import time as time_new
 
 # Authenticate to Twitter
-consumer_key_key = "consumer_key";
-consumer_secret_key = "consumer_secret_key";
-access_token_key = "access_token_key";
-access_token_secret_key = "access_token_secret_key";
+consumer_key_key = "xxx";
+consumer_secret_key = "xxx";
+access_token_key = "xx";
+access_token_secret_key = "xx";
 auth = tweepy.OAuthHandler(consumer_key_key, consumer_secret_key)
 auth.set_access_token(access_token_key, access_token_secret_key)
 
@@ -186,9 +186,9 @@ def getShillText():
 
 def getShillTextPokemon():
     result = "";
-    result = result + getRandomFromList(['First gen starters are finally available!']) + "\n";
-    result = result + getRandomFromList(['You should', 'You may want to', 'I think you would like to', 'You shall', 'You may like to', 'Please, ']);
-    result = result + getRandomFromList(['check it out.', 'give it a try.', 'come, and check it out.', 'buy while still available!', 'discover it!', 'see for yourself!'] + "\n");
+    result = result + getRandomFromList( ["First gen starters are finally available!"] ) + "\n";
+    result = result + getRandomFromList( ["You should", "You may want to", "I think you would like to", "You shall", "You may like to", "Please, "] );
+    result = result + getRandomFromList( ["check it out.", "give it a try.", "come, and check it out.", "buy while still available!", "discover it!", "see for yourself!" ] ) + "\n";
     result = result + "https://opensea.io/collection/pokemons-collectibles" + "\n";
     result = result + "#opensea";
     return result;
@@ -475,8 +475,8 @@ def getShillTextPiNetwork():
     result = result + "Mining doesn't consume your phone power, doesn't use it." + "\n";
     result = result + "Just download the app and create account using my nick as referral (invitation) 'Krevik' " + "\n";
     hashtags = getFewHashtags(hashtagsListPi);
-        for hashtag in hashtags:
-            result = result + str("#" + hashtag + " ");
+    for hashtag in hashtags:
+        result = result + str("#" + hashtag + " ");
             
     return result;
 
@@ -500,7 +500,7 @@ def handlePiNetworkTweet(tweet):
 class PiNetworkStreamListener(tweepy.Stream):
     api1 = tweepy.API(auth, wait_on_rate_limit=True)
     def __init__(self, api=api1):
-        super(PokemonStreamListener,self).__init__(consumer_key_key,consumer_secret_key,access_token_key,access_token_secret_key)
+        super(PiNetworkStreamListener,self).__init__(consumer_key_key,consumer_secret_key,access_token_key,access_token_secret_key)
     #function to collect tweets 
     def on_status (self,status):
         #checkTime();
