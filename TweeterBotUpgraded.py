@@ -8,8 +8,8 @@ from datetime import datetime
 from datetime import time as time_new
 
 # Authenticate to Twitter
-consumer_key_key = "xxx";
-consumer_secret_key = "xxx";
+consumer_key_key = "xx";
+consumer_secret_key = "xx";
 access_token_key = "xx";
 access_token_secret_key = "xx";
 auth = tweepy.OAuthHandler(consumer_key_key, consumer_secret_key)
@@ -187,7 +187,7 @@ def getShillText():
 def getShillTextPokemon():
     result = "";
     result = result + getRandomFromList( ["First gen starters are finally available!"] ) + "\n";
-    result = result + getRandomFromList( ["You should", "You may want to", "I think you would like to", "You shall", "You may like to", "Please, "] );
+    result = result + getRandomFromList( ["You should ", "You may want to ", "I think you would like to ", "You shall ", "You may like to ", "Please, "] );
     result = result + getRandomFromList( ["check it out.", "give it a try.", "come, and check it out.", "buy while still available!", "discover it!", "see for yourself!" ] ) + "\n";
     result = result + "https://opensea.io/collection/pokemons-collectibles" + "\n";
     result = result + "#opensea";
@@ -471,7 +471,7 @@ class ShillPokemonCollection(threading.Thread):
 hashtagsListPi = ["CryptoProject", "PINetwork", "Pi", "Crypto", "MobilePhoneMining", "MobileMining", "PhoneCrypto", "Cryptocurrency", "RevolutionProject"];
 def getShillTextPiNetwork():
     result = "";
-    result = result + "Pi is a new cryptocurrency project. You can get 1 free Pi, and mine it using your mobile phone!" + "\n";
+    result = result + "Pi Network is a new cryptocurrency project. You can get 1 free Pi, and mine it using your mobile phone!" + "\n";
     result = result + "Mining doesn't consume your phone power, doesn't use it." + "\n";
     result = result + "Just download the app and create account using my nick as referral (invitation) 'Krevik' " + "\n";
     hashtags = getFewHashtags(hashtagsListPi);
