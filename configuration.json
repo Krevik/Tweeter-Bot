@@ -1,0 +1,14 @@
+{
+  "consumer_key_key": "xx", 
+  "consumer_secret_key": "xx", 
+  "access_token_key": "xx-xx", 
+  "access_token_secret_key": "xx",
+  "ETH_Wallet_Address": "0xE59FfC3689af47fC501Ce84A2F1cf3C435a67869",
+  "CollectionsToShill": ["https://opensea.io/collection/bismuth-crystals", "https://opensea.io/collection/pokemons-collectibles",
+               "https://opensea.io/collection/crypto-rpg-equipment-gear", "https://opensea.io/collection/crypto-rpg-mobs-leveled",
+               "https://opensea.io/collection/crypto-rpg-mobs-epicized", "https://opensea.io/collection/crypto-rpg-mobs-raritized",
+               "https://opensea.io/collection/crypto-rpg-mobs", "https://opensea.io/collection/crypto-potatoes-k",
+               "https://opensea.io/collection/big-krevik-abstract-collection", "https://opensea.io/collection/fonted-names-future-rot",
+               "https://opensea.io/collection/rotten-potatoes"],
+   "MyNickKeyWords": ["Krzysztof", "Krev"]
+}

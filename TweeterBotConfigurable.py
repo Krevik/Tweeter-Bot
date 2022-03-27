@@ -6,14 +6,16 @@ import _thread as thread
 import threading
 from datetime import datetime
 from datetime import time as time_new
+import json
 
-# Authenticate to Twitter
-consumer_key_key = "xx";
-consumer_secret_key = "xx";
-access_token_key = "xx";
-access_token_secret_key = "xx";
-auth = tweepy.OAuthHandler(consumer_key_key, consumer_secret_key)
-auth.set_access_token(access_token_key, access_token_secret_key)
+### Twitter Authentication constants
+consumer_key_key = "";
+consumer_secret_key = "";
+access_token_key = "";
+access_token_secret_key = "";
+### Wallet Constants
+myETHWalletAdress = "";
+
 
 #Constants
 ####checking if we want to shill
@@ -42,12 +44,7 @@ shillKeySet4 = ["gorgeous", "attractive", "brilliant", "colorful", "delightful",
                 "divine", "staggering", "unheard-of"];
 shillKeySet5 = ["NFT", "NFTs", "#NFT", "#NFTs"];
 shillKeySet6 = ["Art", "Cryptoart", "Collection", "Drop", "Set", "Compilation"];
-collections = ["https://opensea.io/collection/bismuth-crystals", "https://opensea.io/collection/pokemons-collectibles",
-               "https://opensea.io/collection/crypto-rpg-equipment-gear", "https://opensea.io/collection/crypto-rpg-mobs-leveled",
-               "https://opensea.io/collection/crypto-rpg-mobs-epicized", "https://opensea.io/collection/crypto-rpg-mobs-raritized",
-               "https://opensea.io/collection/crypto-rpg-mobs", "https://opensea.io/collection/crypto-potatoes-k",
-               "https://opensea.io/collection/big-krevik-abstract-collection", "https://opensea.io/collection/fonted-names-future-rot",
-               "https://opensea.io/collection/rotten-potatoes"];
+
 ####complimenting
 NFTSites = ["rarible.com/collection/", "opensea.io/collection/", "solanart.io/collections/"];
 complimentKeySet1 = ["gorgeous", "attractive", "brilliant", "colorful", "delightful", "elegant",
@@ -64,16 +61,13 @@ complimentKeySet3 = ["Author should consider art-making as full-time job :D",
                 "I am bad at compliments, but it's really breathtaking art."];
 ####dropping eth address
 ethDropKeySet1 = ["drop your", "post your", "post", "leave your", "leave here"];
-ethDropKeySet2 = ["eth", "etherum"];
+ethDropKeySet2 = ["eth", "etherum", "ethereum"];
 ethDropKeySet3 = ["wallet", "address"];
 
 #################
 keyWordsSet1 = ['nft', 'rarible', 'opensea', 'airdrop', 'cryptoart', '#nft', '#rarible', '#opensea', '#cryptoart', 'NftKrev'];
-keyWordsSet2 = ['drop', 'show', 'i need', 'post your', 'post yours', 'shill', 'should i get', 'i buy', 'i should buy', 'should i buy', 'time nft', 'drop time', 'share', 'your favourite'];
 keyWordsSet3 = ['nft', 'art'];
-keyWordsSet4 = ['monkey', 'mankey', "eth wallet", "wallet", "my drop", "check this link", "check link", "check it out", "check this"];
 keyWordsSet5 = ['airdrop', 'rt', "retweet", "giveway", "opensea.io/"];
-keyWordsSet6 = ['eth', '#eth'];
 keyWordsSet7 = ['adress', 'wallet'];
 
 #####################
@@ -81,25 +75,43 @@ keyWordsPokemon = ['pokemon', 'bulbasaur', 'charmander', 'squirtle'];
 keyWordsPiNetwork = ['crypto'];
 
 
-
-myETHWalletAdress = "0xE59FfC3689af47fC501Ce84A2F1cf3C435a67869";
-
 repliedTweetsIDsCollector = [];
 tweetsToLikeIDCollector = [];
 usersIDToFollowCollector = [];
+collections = [];
+MyNickKeyWords = [];
 
+
+##### CONFIGURATION #######
+with open("configuration.json", "r") as conf:
+    data = json.load(conf);
+    consumer_key_key = data['consumer_key_key'];
+    consumer_secret_key = data['consumer_secret_key'];
+    access_token_key = data['access_token_key'];
+    access_token_secret_key = data['access_token_secret_key'];
+    myETHWalletAdress = data['ETH_Wallet_Address'];
+    collections = data['CollectionsToShill'];
+    MyNickKeyWords = data['MyNickKeyWords'];
+
+###### LOGIN #########
+auth = tweepy.OAuthHandler(consumer_key_key, consumer_secret_key)
+auth.set_access_token(access_token_key, access_token_secret_key)
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
 def login():
     result = False;
+    auth = tweepy.OAuthHandler(consumer_key_key, consumer_secret_key)
+    auth.set_access_token(access_token_key, access_token_secret_key)
     api = tweepy.API(auth, wait_on_rate_limit=True)
-    try:
-        api.verify_credentials();
-        print("Successfully Logged In");
-        result = True;
-    except:
-        print("Error Loggin in");
-        result = False;
+    while(not result):
+        try:
+            api.verify_credentials();
+            print("Successfully Logged In");
+            result = True;
+        except:
+            print("Error Loggin in, Retrying in 3-12 seconds...");
+            result = False;
+            time.sleep(random.randint(3,12));
     return result;
 
 def publishTweet(text):
@@ -108,17 +120,17 @@ def publishTweet(text):
         api.update_status(text);
         print(f"Successfully published a tweet with text: {text}");
     except:
-        print("Couldn't publish a Tweet");
+        print("Couldn't publish a Tweet. Sleeping for 60-120 secs");
         time.sleep(random.randint(60,120));
 
 def replyToTweet(tweet, text):
-    if("Krzysztof" not in tweet.user.name and "NftKrev" not in tweet.user.name):
+    if( not isAnyWordPresent(MyNickKeyWords, tweet.user.name) ):
         if(tweet.id not in repliedTweetsIDsCollector):
             try:
                 api.update_status(status=text, in_reply_to_status_id=tweet.id, auto_populate_reply_metadata=True)
                 print(f"Answered to {tweet.user.name} : {text}");
             except:
-                print(f"Couldn't answer to {tweet.user.name}");
+                print(f"Couldn't answer to {tweet.user.name}. Sleeping for 30 secs");
                 time.sleep(30);
             if(len(repliedTweetsIDsCollector) > 600):
                 repliedTweetsIDsCollector.clear();
@@ -162,12 +174,12 @@ def publishSomeTweet():
 def doesProvokeMeToShill(tweet):
     result = False;
     if(isAnyWordPresent(interactKeySet1, tweet.text) and isAnyWordPresent(interactKeySet2, tweet.text)
-       and not isAnyWordPresent(["Krev"], tweet.text)):
+       and not isAnyWordPresent(MyNickKeyWords, tweet.text) ):
         result = True;
     return result;
 
 def doesProvokeMeToComplimentTheCollection(tweet):
-    return isAnyWordPresent(NFTSites, tweet.text) and not isAnyWordPresent(["Krev"], tweet.text);
+    return isAnyWordPresent(NFTSites, tweet.text) and not isAnyWordPresent(MyNickKeyWords, tweet.text);
 
 def doesProvokeMeToDropETHAddress(tweet):
     return isAnyWordPresent(ethDropKeySet1, tweet.text) and isAnyWordPresent(ethDropKeySet2, tweet.text) and isAnyWordPresent(ethDropKeySet3, tweet.text);
@@ -181,15 +193,6 @@ def getShillText():
     result = result + getRandomFromList(shillKeySet3) + " " + getRandomFromList(shillKeySet4) + " ";
     result = result + getRandomFromList(shillKeySet5) + " " + getRandomFromList(shillKeySet6) + "\n";
     result = result + getRandomFromList(collections) + "\n";
-    result = result + "#opensea";
-    return result;
-
-def getShillTextPokemon():
-    result = "";
-    result = result + getRandomFromList( ["First gen starters are finally available!"] ) + "\n";
-    result = result + getRandomFromList( ["You should ", "You may want to ", "I think you would like to ", "You shall ", "You may like to ", "Please, "] );
-    result = result + getRandomFromList( ["check it out.", "give it a try.", "come, and check it out.", "buy while still available!", "discover it!", "see for yourself!" ] ) + "\n";
-    result = result + "https://opensea.io/collection/pokemons-collectibles" + "\n";
     result = result + "#opensea";
     return result;
 
@@ -238,23 +241,6 @@ def handleTweet(tweet):
                     retweeted = True;
                 replyToTweet(tweet, myETHWalletAdress);
             
-        retweeted = False;
-        
-    time.sleep(random.randint(10,25));
-
-def handlePokemonTweet(tweet):
-    #check if we don't like it already
-    if(not tweet.favorited):
-        is_reply = False;
-        #check if the tweet is a reply
-        if tweet.in_reply_to_status_id is not None:
-            # Tweet is a reply
-            is_reply = True
-        shilled = False;
-        #check if we want to shill under the tweet that can't be reply
-        if not is_reply:
-            replyToTweet(tweet, getShillTextPokemon());
-            shilled=True;   
         retweeted = False;
         
     time.sleep(random.randint(10,25));
@@ -439,35 +425,6 @@ class FollowingThread(threading.Thread):
                 time.sleep(random.randint(31,45));
 
 
-class PokemonStreamListener(tweepy.Stream):
-    api1 = tweepy.API(auth, wait_on_rate_limit=True)
-    def __init__(self, api=api1):
-        super(PokemonStreamListener,self).__init__(consumer_key_key,consumer_secret_key,access_token_key,access_token_secret_key)
-    #function to collect tweets 
-    def on_status (self,status):
-        #checkTime();
-        tweet = status;
-        handlePokemonTweet(tweet);
-    def on_error(self, status_code):
-        if status_code == 420:
-            #returning False in on_error disconnects the stream
-            return False
-
-class ShillPokemonCollection(threading.Thread):
-    def __init__(self, threadID, name, counter):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.counter = counter
-    def run(self):
-        print("Starting Pokemon Stream Listening Thread");
-        while True:
-            #checkTime();
-            stream = PokemonStreamListener()
-            stream.filter(track=keyWordsPokemon)
-            time.sleep(random.randint(20,30));
-
-
 hashtagsListPi = ["CryptoProject", "PINetwork", "Pi", "Crypto", "MobilePhoneMining", "MobileMining", "PhoneCrypto", "Cryptocurrency", "RevolutionProject"];
 def getShillTextPiNetwork():
     result = "";
@@ -494,7 +451,6 @@ def handlePiNetworkTweet(tweet):
             replyToTweet(tweet, getShillTextPiNetwork());
             shilled=True;   
         retweeted = False;
-        
     time.sleep(random.randint(10,25));
 
 class PiNetworkStreamListener(tweepy.Stream):
@@ -505,7 +461,7 @@ class PiNetworkStreamListener(tweepy.Stream):
     def on_status (self,status):
         #checkTime();
         tweet = status;
-        handlePokemonTweet(tweet);
+        handlePiNetworkTweet(tweet);
     def on_error(self, status_code):
         if status_code == 420:
             #returning False in on_error disconnects the stream
@@ -530,19 +486,17 @@ class PINetworkReferall(threading.Thread):
 
 # Create new threads
 thread1 = NFTStreamListeningThread(1, "Thread-1", 1);
-thread3 = FollowingThread(3, "Thread-3", 3);
-thread4 = TwittingThread(4, "Thread-4", 4);
-thread5 = SharingCollectionsThread(5, "Thread-5", 5);
-thread6 = ShillPokemonCollection(6, "Thread-6", 6);
-thread7 = PINetworkReferall(7, "Thread-7", 7);
+thread2 = FollowingThread(2, "Thread-2", 2);
+thread3 = TwittingThread(3, "Thread-3", 3);
+thread4 = SharingCollectionsThread(4, "Thread-4", 4);
+thread5 = PINetworkReferall(5, "Thread-5", 5);
 
 def runBot():
     login();
     thread1.start();
+    thread2.start();
     thread3.start();
     thread4.start();
     thread5.start();
-    thread6.start();
-    thread7.start();
 
 runBot();
