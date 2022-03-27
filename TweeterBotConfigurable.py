@@ -80,6 +80,7 @@ tweetsToLikeIDCollector = [];
 usersIDToFollowCollector = [];
 collections = [];
 MyNickKeyWords = [];
+PiNetworkNick = "";
 
 
 ##### CONFIGURATION #######
@@ -92,6 +93,7 @@ with open("configuration.json", "r") as conf:
     myETHWalletAdress = data['ETH_Wallet_Address'];
     collections = data['CollectionsToShill'];
     MyNickKeyWords = data['MyNickKeyWords'];
+    PiNetworkNick = data['PiNetworkNick'];
 
 ###### LOGIN #########
 auth = tweepy.OAuthHandler(consumer_key_key, consumer_secret_key)
@@ -430,7 +432,7 @@ def getShillTextPiNetwork():
     result = "";
     result = result + "Pi Network is a new cryptocurrency project. You can get 1 free Pi, and mine it using your mobile phone!" + "\n";
     result = result + "Mining doesn't consume your phone power, doesn't use it." + "\n";
-    result = result + "Just download the app and create account using my nick as referral (invitation) 'Krevik' " + "\n";
+    result = result + "Just download the app and create account using my nick as referral (invitation) " + PiNetworkNick + "\n";
     hashtags = getFewHashtags(hashtagsListPi);
     for hashtag in hashtags:
         result = result + str("#" + hashtag + " ");
