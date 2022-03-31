@@ -75,16 +75,12 @@ keyWordsSet7 = ['adress', 'wallet'];
 
 #####################
 keyWordsPokemon = ['pokemon', 'bulbasaur', 'charmander', 'squirtle'];
-keyWordsPiNetwork = ['crypto'];
-
 
 repliedTweetsIDsCollector = [];
 tweetsToLikeIDCollector = [];
 usersIDToFollowCollector = [];
 collections = [];
 MyNickKeyWords = [];
-PiNetworkNick = "";
-
 
 ##### CONFIGURATION #######
 with open("configuration.json", "r") as conf:
@@ -96,7 +92,6 @@ with open("configuration.json", "r") as conf:
     myETHWalletAdress = data['ETH_Wallet_Address'];
     collections = data['CollectionsToShill'];
     MyNickKeyWords = data['MyNickKeyWords'];
-    PiNetworkNick = data['PiNetworkNick'];
 
 ###### LOGIN #########
 auth = tweepy.OAuthHandler(consumer_key_key, consumer_secret_key)
@@ -362,17 +357,6 @@ def likeSomeTweet():
         except:
             print(f"Couldn't like tweet with id: {tweetID}");
 
-def followSomeUser():
-    if(len(usersIDToFollowCollector) > 1):
-        userID = usersIDToFollowCollector[random.randint(0, len(usersIDToFollowCollector) - 1)];
-        try:
-            api = tweepy.API(auth, wait_on_rate_limit=True)
-            api.create_friendship(user_id=int(userID));
-            print(f"Successfully followed user with id: {userID}");
-        except:
-            print(f"Couldn't follow user with id: {userID}");
-            time.sleep(random.randint(30*60, 120*60));
-
 class NFTStreamListener(tweepy.Stream):
     api1 = tweepy.API(auth, wait_on_rate_limit=True)
     def __init__(self, api=api1):
@@ -401,23 +385,8 @@ class NFTStreamListeningThread(threading.Thread):
             stream.filter(track=keyWordsSet1)
             time.sleep(random.randint(20,30));
 
-class FollowingThread(threading.Thread):
-    def __init__(self, threadID, name, counter):
-        threading.Thread.__init__(self)
-        self.threadID = threadID;
-        self.name = name;
-        self.counter = counter;
-    def run(self):
-        print("Starting Follow Followers Thread");
-        while True:
-            #checkTime();
-            if(len(usersIDToFollowCollector) > 1):
-                followSomeUser();
-                time.sleep(random.randint(31,45));
-
 # Create new threads
 thread1 = NFTStreamListeningThread(1, "Thread-1", 1);
-thread2 = FollowingThread(2, "Thread-2", 2);
 thread3 = TwittingThread(3, "Thread-3", 3);
 thread4 = SharingCollectionsThread(4, "Thread-4", 4);
 
