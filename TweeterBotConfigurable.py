@@ -73,12 +73,13 @@ keyWordsSet3 = ['nft', 'art'];
 keyWordsSet5 = ['airdrop', 'rt', "retweet", "giveway", "opensea.io/"];
 keyWordsSet7 = ['adress', 'wallet'];
 
-#####################
+##################### VARIABLES AND CONSTANTS
 
 repliedTweetsIDsCollector = [];
 usersIDToFollowCollector = [];
 collections = [];
 MyNickKeyWords = [];
+failedRetweetsInRow = 0;
 
 ##### CONFIGURATION #######
 with open("configuration.json", "r") as conf:
@@ -138,13 +139,23 @@ def replyToTweet(tweet, text):
 def getRandomFromList(list1):
     return list1[random.randint(0, len(list1) - 1)];
 
+
 def retweetTweet(tweet):
+    result = False;
+    global failedRetweetsInRow;
     try:
         api = tweepy.API(auth, wait_on_rate_limit=True)
         api.retweet(int(tweet.id));
         print(f"Successfully retweeted a tweet of: {tweet.user.name}");
+        result = True;
     except:
         print(f"Couldn't retweet a Tweet of: {tweet.user.name}");
+        result = False;
+    if result:
+        failedRetweetsInRow = 0;
+    if not result:
+        failedRetweetsInRow = failedRetweetsInRow + 1;
+    if failedRetweetsInRow >= 3:
         time.sleep(random.randint(60,120));
 
 def isAnyWordPresent(list1, text):
