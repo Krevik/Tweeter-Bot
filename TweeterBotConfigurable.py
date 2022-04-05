@@ -80,6 +80,7 @@ usersIDToFollowCollector = [];
 collections = [];
 MyNickKeyWords = [];
 failedRetweetsInRow = 0;
+failedRepliesInRow = 0;
 
 ##### CONFIGURATION #######
 with open("configuration.json", "r") as conf:
@@ -125,16 +126,24 @@ def publishTweet(text):
 def replyToTweet(tweet, text):
     if( not isAnyWordPresent(MyNickKeyWords, tweet.user.name) ):
         if(tweet.id not in repliedTweetsIDsCollector):
+            global failedRepliesInRow;
+            result = False;
             try:
                 api.update_status(status=text, in_reply_to_status_id=tweet.id, auto_populate_reply_metadata=True)
                 print(f"Answered to {tweet.user.name} : {text}");
+                result = True;
             except:
-                print(f"Couldn't answer to {tweet.user.name}. Sleeping for 30 secs");
-                time.sleep(30);
+                result = False;
+                print(f"Couldn't answer to {tweet.user.name}.");
             if(len(repliedTweetsIDsCollector) > 5000):
                 repliedTweetsIDsCollector.clear();
             repliedTweetsIDsCollector.append(tweet.id);
-            time.sleep(random.randint(3,12));
+            if not result:
+                failedRepliesInRow = failedRepliesInRow + 1;
+            if failedRepliesInRow >= 3:
+                sleepingTime = 2*failedRepliesInRow*failedRepliesInRow + random.randint(10,30);
+                print(f"Replying thread is going to sleep for {sleepingTime} secs.");
+                time.sleep(sleepingTime);
 
 def getRandomFromList(list1):
     return list1[random.randint(0, len(list1) - 1)];
@@ -156,7 +165,9 @@ def retweetTweet(tweet):
     if not result:
         failedRetweetsInRow = failedRetweetsInRow + 1;
     if failedRetweetsInRow >= 3:
-        time.sleep(random.randint(60,120));
+        sleepingTime = 2*failedRetweetsInRow*failedRetweetsInRow + random.randint(10,30);
+        print(f"Retweeting thread is going to sleep for {sleepingTime} secs.");
+        time.sleep(sleepingTime);
 
 def isAnyWordPresent(list1, text):
     result = False;
