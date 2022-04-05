@@ -74,10 +74,8 @@ keyWordsSet5 = ['airdrop', 'rt', "retweet", "giveway", "opensea.io/"];
 keyWordsSet7 = ['adress', 'wallet'];
 
 #####################
-keyWordsPokemon = ['pokemon', 'bulbasaur', 'charmander', 'squirtle'];
 
 repliedTweetsIDsCollector = [];
-tweetsToLikeIDCollector = [];
 usersIDToFollowCollector = [];
 collections = [];
 MyNickKeyWords = [];
@@ -132,10 +130,10 @@ def replyToTweet(tweet, text):
             except:
                 print(f"Couldn't answer to {tweet.user.name}. Sleeping for 30 secs");
                 time.sleep(30);
-            if(len(repliedTweetsIDsCollector) > 600):
+            if(len(repliedTweetsIDsCollector) > 5000):
                 repliedTweetsIDsCollector.clear();
             repliedTweetsIDsCollector.append(tweet.id);
-            time.sleep(random.randint(30,60));
+            time.sleep(random.randint(3,12));
 
 def getRandomFromList(list1):
     return list1[random.randint(0, len(list1) - 1)];
@@ -158,9 +156,6 @@ def isAnyWordPresent(list1, text):
 
 def doesProvokeMeToRetweet(tweet):
     return (isAnyWordPresent(keyWordsSet5, tweet.text) and isAnyWordPresent(keyWordsSet3, tweet.text));
-
-def doesProvokeToRetweet1(tweet):
-    return isAnyWordPresent(["rt", "retweet"], tweet.text);
     
 def publishSomeTweet():
     tweetTexts = generateTweetTexts();
@@ -184,9 +179,6 @@ def doesProvokeMeToComplimentTheCollection(tweet):
 def doesProvokeMeToDropETHAddress(tweet):
     return isAnyWordPresent(ethDropKeySet1, tweet.text) and isAnyWordPresent(ethDropKeySet2, tweet.text) and isAnyWordPresent(ethDropKeySet3, tweet.text);
 
-def doesProvokeMeToTagFriends(tweet):
-    return isAnyWordPresent(tagKeySet1, tweet.text) and isAnyWordPresent(tagKeySet2, tweet.text);
-
 def getShillText():
     result = "";
     result = result + getRandomFromList(shillKeySet1) + " " + getRandomFromList(shillKeySet2) + " ";
@@ -208,19 +200,23 @@ def getRandomCompliment():
 
 def handleTweet(tweet):
     #check if we don't like it already
+    shilled = False;
+    retweeted=False;
+    complimented = False;
+    dropETHAddress = False;
     if(not tweet.favorited):
         is_reply = False;
         #check if the tweet is a reply
         if tweet.in_reply_to_status_id is not None:
             # Tweet is a reply
             is_reply = True
-        shilled = False;
-        retweeted=False;
-        complimented = False;
-        dropETHAddress = False;
         #does provoke me to drop eth address
         if(doesProvokeMeToDropETHAddress(tweet)):
             dropETHAddress = True;
+            replyToTweet(tweet, myETHWalletAdress);
+            if(doesProvokeMeToRetweet(tweet)):
+                retweetTweet(tweet);
+                retweeted = True;
         #check if we want to shill under the tweet that can't be reply
         if doesProvokeMeToShill(tweet) and not is_reply and not dropETHAddress:
             replyToTweet(tweet, getShillText());
@@ -229,21 +225,12 @@ def handleTweet(tweet):
         if doesProvokeMeToComplimentTheCollection(tweet) and not dropETHAddress:
             replyToTweet(tweet, getRandomCompliment());
             complimented=True;
-            #5% chance that we retweet it
+            #low chance that we retweet it
             if random.randint(1,5) == 3:
                 retweetTweet(tweet);
                 retweeted = True;
-        #check if we want to drop our eth address (giveaways)
-        if not retweeted and not is_reply:
-            if dropETHAddress:
-                if doesProvokeMeToRetweet(tweet):
-                    retweetTweet(tweet);
-                    retweeted = True;
-                replyToTweet(tweet, myETHWalletAdress);
-            
-        retweeted = False;
-        
-    time.sleep(random.randint(10,25));
+    if(shilled or retweeted or complimented or dropETHAddress):
+        time.sleep(random.randint(5,15));
 
 def getFewHashtags(list1):
     amount = random.randint(1, 3);
@@ -347,16 +334,6 @@ def checkTime():
     if now_time >= time_new(22,00) or now_time <= time_new(8,00):
         time.sleep(random.randint(1*60*60, 2*60*60));
 
-def likeSomeTweet():
-    if(len(tweetsToLikeIDCollector) > 1):
-        tweetID = tweetsToLikeIDCollector[random.randint(0, len(tweetsToLikeIDCollector) - 1)];
-        try:
-            api = tweepy.API(auth, wait_on_rate_limit=True)
-            api.create_favorite(tweetID);
-            print(f"Successfully liked tweet with id: {tweetID}");
-        except:
-            print(f"Couldn't like tweet with id: {tweetID}");
-
 class NFTStreamListener(tweepy.Stream):
     api1 = tweepy.API(auth, wait_on_rate_limit=True)
     def __init__(self, api=api1):
@@ -392,7 +369,7 @@ thread4 = SharingCollectionsThread(4, "Thread-4", 4);
 
 def runBot():
     login();
-    #thread1.start();
+    thread1.start();
     #thread2.start();
     #thread3.start();
     #thread4.start();
