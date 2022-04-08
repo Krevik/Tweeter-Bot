@@ -137,7 +137,9 @@ def replyToTweet(tweet, text):
                 print(f"Couldn't answer to {tweet.user.name}.");
             if(len(repliedTweetsIDsCollector) > 5000):
                 repliedTweetsIDsCollector.clear();
-            repliedTweetsIDsCollector.append(tweet.id);
+            if result:
+                failedRepliesInRow = 0;
+                repliedTweetsIDsCollector.append(tweet.id);
             if not result:
                 failedRepliesInRow = failedRepliesInRow + 1;
             if failedRepliesInRow >= 3:
@@ -252,7 +254,7 @@ def handleTweet(tweet):
                 retweetTweet(tweet);
                 retweeted = True;
     if(shilled or retweeted or complimented or dropETHAddress):
-        time.sleep(random.randint(5,15));
+        time.sleep(random.randint(30,60));
 
 def getFewHashtags(list1):
     amount = random.randint(1, 3);
